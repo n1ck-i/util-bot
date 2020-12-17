@@ -1,9 +1,13 @@
 package org.ub.utilbot.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
+import org.ub.utilbot.commandutils.CommandManager;
 
 public class ExampleCommand implements Command {
+    private static final Logger log = LogManager.getLogger(CommandManager.class);
     @Override
     public String getName() {
         return "test";
@@ -21,6 +25,7 @@ public class ExampleCommand implements Command {
 
     @Override
     public void onCommand(CommandContext context) {
-        context.getChannel().sendMessage("Wooooo es testet!").queue();
+        context.getChannel().sendMessage("AAAAAAAAAAAAAAAAAAAA").queue();
+        log.info("A");
     }
 }

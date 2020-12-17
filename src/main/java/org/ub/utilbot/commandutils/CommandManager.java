@@ -2,29 +2,27 @@ package org.ub.utilbot.commandutils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.ub.utilbot.Bot;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandManager {
     private static final Logger log = LogManager.getLogger(CommandManager.class);
     private static final String PREFIX = "!";
 
-    private static List<Command> commands = new ArrayList<>();
+    private static Map<String,Command> commands = new HashMap<>();
 
 
     public static void runCommand(CommandContext context) {
         Command commandToRun = null;
 
-        for (Command command: commands) {
-            if (context.getLabel().equalsIgnoreCase(command.getName())) {
-                commandToRun = command;
-            }
-        }
+        commandToRun = commands.get(context.getLabel().toLowerCase());
+
 
         if (commandToRun == null) {
+            log.warn("Command was not found: " + context.getLabel());
             return;
+
         }
 
         log.info("Ran command: " + commandToRun.getName());
@@ -37,12 +35,7 @@ public class CommandManager {
      * @return          Whether or not the given command is already registered
      */
     private static boolean commandExists(Command command) {
-        for (Command existingCommand: commands) {
-            if (command.equals(existingCommand)) {
-                return true;
-            }
-        }
-        return false;
+        return commands.containsKey(command.getName().toLowerCase());
     }
 
     /**
@@ -51,8 +44,8 @@ public class CommandManager {
      */
     public static void registerCommand(Command command) {
         if (!commandExists(command)) {
-            commands.add(command);
-            log.info("Registered command: " + command.getName());
+            commands.put(command.getName().toLowerCase(), command);
+            log.info("Registered command: " + command.getName().toLowerCase());
         }
     }
 
@@ -60,6 +53,7 @@ public class CommandManager {
      * Tries to unregister a command that is equal according to the given .equals() method.
      * @param command   The command to unregister
      */
+    /*
     public static void unregisterCommand(Command command) {
         if (commandExists(command)) {
             for(int i = 0; i < commands.size(); i++) {
@@ -69,7 +63,7 @@ public class CommandManager {
                 }
             }
         }
-    }
+    }*/
 
     /**
      *
@@ -83,7 +77,8 @@ public class CommandManager {
      *
      * @return  A list of all registered commands
      */
-    public static List<Command> getCommands() {
+    public static Map<String, Command> getCommands() {
         return commands;
     }
+
 }

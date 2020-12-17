@@ -27,6 +27,7 @@ public class CommandManager {
             return;
         }
 
+        log.info("Ran command: " + commandToRun.getName());
         commandToRun.onCommand(context);
     }
 

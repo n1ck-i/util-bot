@@ -51,27 +51,5 @@ public class Bot extends ListenerAdapter implements CommandLineRunner {
     public JDA getClient() {
         return this.client;
     }
-    /*
-    @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
-        log.info("Received message: " + e.getMessage().getContentRaw());
-        String prefix = CommandManager.getPrefix();
-
-        if (!e.getMessage().getContentRaw().startsWith(prefix)) {
-            return;
-        }
-
-        String[] messageContent = e.getMessage().getContentStripped().replace(prefix,"").split("");
-
-        String command = messageContent[0];
-        String[] args = {};
-        if (messageContent.length > 1) {
-            args = Arrays.copyOfRange(messageContent, 1, messageContent.length - 1);
-        }
-
-        CommandContext context = new CommandContext(e.getMember(), e.getChannel(), e.getMessage(), command, args);
-
-        CommandManager.runCommand(context);
-    }*/
 
 }

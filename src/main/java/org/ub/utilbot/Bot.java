@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import org.ub.utilbot.commands.ExampleCommand;
+import org.ub.utilbot.commands.RepositoryAccess;
 import org.ub.utilbot.commandutils.CommandManager;
 import org.ub.utilbot.commandutils.MessageReceivedListener;
 
@@ -32,6 +33,7 @@ public class Bot implements CommandLineRunner {
         log.info("Bot started.");
 
         CommandManager.registerCommand(new ExampleCommand());
+        CommandManager.registerCommand(new RepositoryAccess());
 
     }
 

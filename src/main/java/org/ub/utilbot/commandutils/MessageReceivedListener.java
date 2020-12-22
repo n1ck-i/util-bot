@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
-import org.ub.utilbot.Bot;
 
 import java.util.Arrays;
 
@@ -26,7 +25,7 @@ public class MessageReceivedListener extends ListenerAdapter {
         String command = messageContent[0];
         String[] args = {};
         if (messageContent.length > 1) {
-            args = Arrays.copyOfRange(messageContent, 1, messageContent.length - 1);
+            args = Arrays.copyOfRange(messageContent, 1, messageContent.length);
         }
 
         CommandContext context = new CommandContext(e.getMember(), e.getChannel(), e.getMessage(), command, args);

@@ -7,7 +7,7 @@ package org.ub.utilbot;
  *
  */
 
-/*
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.entities.User;
 import org.ub.utilbot.repositories.UserRepository;
-
+/*
 // @Component is used so that the springframework knows to instaciate this class
-@Component
+//@Component
 // the profile settings are set so that this will not be executed during JUnit context test (compile time)
 @Profile("!test")
 public class TestRunner implements CommandLineRunner {
@@ -34,8 +34,12 @@ public class TestRunner implements CommandLineRunner {
 	@Autowired
 	private UserRepository userRepo;
 
+	@Autowired
+    private Bot bot;
+
 	@Override
 	public void run(String... args) throws Exception {
+
 		// findAll() will query for all available entries in the database
 		for (User u : userRepo.findAll()) {
 			//log.info(u.getDiscordId());
@@ -57,5 +61,4 @@ public class TestRunner implements CommandLineRunner {
 		log.info("New user saved under id: " + second.getId());
 	}
 
-}
-*/
+}*/

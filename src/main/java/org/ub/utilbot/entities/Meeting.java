@@ -21,7 +21,7 @@ public class Meeting {
 	@Column(name = "id", updatable = false, nullable = false)
 	private String id;
 
-	@Column(name = "refTutorId", nullable = false)
+	@Column(name = "refTutorId", nullable = true)
 	private String refTutorId;
 
 	@Column(name = "refProfId", nullable = false)
@@ -34,7 +34,7 @@ public class Meeting {
 	private String link;
 
 	@Column(name = "Weekday", nullable = false)
-	private String weekday;
+	private int weekday;
 
 	@Column(name = "StartTime", nullable = false)
 	private Time startTime;
@@ -79,11 +79,11 @@ public class Meeting {
 		this.link = link;
 	}
 
-	public String getWeekday() {
+	public int getWeekday() {
 		return weekday;
 	}
 
-	public void setWeekday(String weekday) {
+	public void setWeekday(int weekday) {
 		this.weekday = weekday;
 	}
 

@@ -15,7 +15,7 @@ public class JDAClient {
     private final Logger log = LogManager.getLogger(JDAClient.class);
 
     private JDAClient() throws LoginException {
-        client = JDABuilder.createDefault("Nzg2Mjk3NDczMTQ0NDU1MjA5.X9EWlg.9e2TTZwSDMh_hIUZNx8lxq8bj9s").build();
+        client = JDABuilder.createDefault("Nzg2Mjk3NDczMTQ0NDU1MjA5.X9EWlg.Nsjc4ZkqY7rLAaqrtVnWADJ54IU").build();
     }
 
     public static JDAClient getInstance() throws LoginException {

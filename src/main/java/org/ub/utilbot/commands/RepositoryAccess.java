@@ -110,10 +110,8 @@ public class RepositoryAccess implements Command {
             log.error(e.toString());
             return;
         }
-        d.setTime(d.getTime() + 3600000L);
         Time t =  new Time(d.getTime());
         meeting.setStartTime(t);
-
         meeting.setWeekday(Integer.parseInt(context.getArgs()[3]));
         meeting.setLink(context.getArgs()[4]);
 
@@ -137,7 +135,6 @@ public class RepositoryAccess implements Command {
             log.error(e.toString());
             return;
         }
-        d.setTime(d.getTime() + 3600000L);
         Time t =  new Time(d.getTime());
         meeting.setStartTime(t);
         meeting.setWeekday(Integer.parseInt(context.getArgs()[4]));

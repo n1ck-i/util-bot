@@ -40,7 +40,7 @@ public class Tutor {
 
 	@Override
 	public String toString() {
-		return "Tutor[id=%s, name=%s]".formatted(this.id, this.name);
+		return "Bro";//"Tutor[id=%s, name=%s]".formatted(this.id, this.name);
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.ub.utilbot.entities;
 
 import java.sql.Time;
+import java.text.MessageFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,7 +35,7 @@ public class Meeting {
 	private String link;
 
 	@Column(name = "Weekday", nullable = false)
-	private String weekday;
+	private Integer weekday;
 
 	@Column(name = "StartTime", nullable = false)
 	private Time startTime;
@@ -79,11 +80,11 @@ public class Meeting {
 		this.link = link;
 	}
 
-	public String getWeekday() {
+	public Integer getWeekday() {
 		return weekday;
 	}
 
-	public void setWeekday(String weekday) {
+	public void setWeekday(Integer weekday) {
 		this.weekday = weekday;
 	}
 
@@ -97,18 +98,15 @@ public class Meeting {
 
 	@Override
 	public String toString() {
-		return 
-			"Meeting[id=%s, refTutorId=%s, refProfId=%s, " + 
-			"GroupNumber=%d, Link=%s, weekday=%d, starttime=%s]"
-			.formatted(
-					this.id,
-					this.refTutorId,
-					this.refProfId,
-					this.groupNumber,
-					this.link,
-					this.weekday,
-					this.startTime
-				);
+		return MessageFormat.format("Meeting[id={0}, refTutorId={1}, refProfId={2}, " +
+						"GroupNumber={3}, Link={4}, weekday={5}, starttime={6}]",
+				this.id,
+				this.refTutorId,
+				this.refProfId,
+				this.groupNumber,
+				this.link,
+				this.weekday,
+				this.startTime);
 	}
 
 }

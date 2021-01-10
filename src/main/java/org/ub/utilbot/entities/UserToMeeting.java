@@ -51,8 +51,8 @@ public class UserToMeeting {
 
 	@Override
 	public String toString() {
-		return "UserToMeeting[id=%s, refUserId=%s, refMeetingId=%s]"
-			.formatted(this.id, this.refUserId, this.refMeetingId);
+		return "Stuff";//"UserToMeeting[id=%s, refUserId=%s, refMeetingId=%s]"
+			//.formatted(this.id, this.refUserId, this.refMeetingId);
 	}
 
 }

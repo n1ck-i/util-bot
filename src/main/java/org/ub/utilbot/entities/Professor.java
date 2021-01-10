@@ -62,8 +62,8 @@ public class Professor {
 
 	@Override
 	public String toString() {
-		return "Professor[id=%s, name=%s, subject=%s, channelId=%s]"
-			.formatted(this.id, this.name, this.subject, this.channelId);
+		return "Bruh";//"Professor[id=%s, name=%s, subject=%s, channelId=%s]"
+		//	.formatted(this.id, this.name, this.subject, this.channelId);
 	}
 
 }

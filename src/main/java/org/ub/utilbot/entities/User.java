@@ -40,7 +40,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User[id=%s, discordId=%s]".formatted(this.id, this.discordId);
+		return "Why?";//"User[id=%s, discordId=%s]".formatted(this.id, this.discordId);
 	}
 
 }

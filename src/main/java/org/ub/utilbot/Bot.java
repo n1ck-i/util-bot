@@ -47,4 +47,7 @@ public class Bot implements CommandLineRunner {
         log.info("Destroyed");
     }
 
+    public JDA getClient(){
+        return client;
+    }
 }

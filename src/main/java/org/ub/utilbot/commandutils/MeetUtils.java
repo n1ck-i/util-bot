@@ -1,14 +1,10 @@
-package org.ub.utilbot.commands;
+package org.ub.utilbot.commandutils;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Component;
-import org.ub.utilbot.commandutils.Command;
-import org.ub.utilbot.commandutils.CommandContext;
-import org.ub.utilbot.commandutils.MeetUtils;
+import org.ub.utilbot.commands.RequestMeeting;
 import org.ub.utilbot.entities.Meeting;
 import org.ub.utilbot.entities.Professor;
 import org.ub.utilbot.entities.Tutor;
@@ -23,83 +19,45 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
-public class RequestMeeting implements Command {
-    @Autowired
+public class MeetUtils {
+
     private ProfessorRepository profRepository;
 
-    @Autowired
     private MeetingRepository meetRepository;
 
-    @Autowired
     private TutorRepository tutRepository;
 
-    private final Logger log = LogManager.getLogger(RequestMeeting.class);
+    private final Logger log = LogManager.getLogger(MeetUtils.class);
 
-    @Override
-    public String getName() {
-        return "meeting";
+    public MeetUtils(ProfessorRepository profRepository, MeetingRepository meetRepository, TutorRepository tutRepository) {
+        this.profRepository = profRepository;
+        this.meetRepository = meetRepository;
+        this.tutRepository = tutRepository;
     }
 
-    @Override
-    public String getDescription() {
-        return "Returns information regarding the different lectures and meetings.";
-    }
+    public List<Meeting> getMeetings(String subject, String identifier, int day) {
+        // Grab a list of professors and of IDs
+        List<Professor> subjectProfs = (List<Professor>) profRepository.findBySubject(subject);
+        List<String> subjectProfsIDs = subjectProfs.stream()
+                .map(Professor::getId)
+                .collect(Collectors.toList());
 
-    @Override
-    public String getUsage() {
-        return "!meeting [subject] [identifier]";
-    }
+        // Filter the meetingList by which meeting's professor's ID is on the list of subjectProfs IDs
+        List<Meeting> meetings = ((List<Meeting>)meetRepository.findAll()).stream()
+                .filter(m -> subjectProfsIDs.contains(m.getRefProfId()))
+                .collect(Collectors.toList());
 
-    @Override
-    public void onCommand(CommandContext context) {
-        // Checks if there are arguments present
-        if (context.getArgs().length == 0) {
-            context.getChannel().sendMessage("I need arguments to figure out which meetings you want information for.\nThe usage is as follows: `!meeting [subject] [identifier]`").queue();
-            return;
-        }
-
-        // Checks if the first argument is a valid subject
-        List<String> types = getTypes();
-        if (!types.contains(context.getArgs()[0])) {
-            context.getChannel().sendMessage("Please give me the subject you want me to get the lectures for first. It should be one of these: " + types.toString()).queue();
-            return;
-        }
-
-        // Subject is the first argument and the rest is concatenated to be the identifier
-        String subject = context.getArgs()[0];
-
-        String identifier = String.join(" ", Arrays.copyOfRange(context.getArgs(),1,context.getArgs().length));
-
-        int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2) % 7;
-        MeetUtils util = new MeetUtils(profRepository,meetRepository,tutRepository);
-        context.getChannel().sendMessage(util.meetResponse(util.getMeetings(subject,identifier,day))).queue();
-
-
-
-        /*
         // If there's no identifier, then it returns the subject's lectures
         if (identifier.equals("")) {
-            List<Meeting> meetings = ((List<Meeting>) meetRepository.findAll()).stream()
+            meetings = meetings.stream()
                     .filter(m -> m.getRefTutorId() == null)
                     .collect(Collectors.toList());
-
-            context.getChannel().sendMessage(meetResponse(meetings, subject)).queue();
         }
 
         // Lists all of today's lectures and tutorings for the selected subject
         else if (identifier.equalsIgnoreCase("list")) {
+            meetings = meetings.stream().filter(m -> m.getWeekday() == day).collect(Collectors.toList());
 
-            List<Meeting> meetings = (List<Meeting>) meetRepository.findByWeekday(day);
-
-            if (meetings.size() > 0) {
-
-                context.getChannel().sendMessage(meetResponse(meetings, subject)).queue();
-            }
-            else {
-
-                String response = "There are no lectures or tutorings for this subject today.";
-                context.getChannel().sendMessage(response).queue();
-            }
         }
 
         // If the user wants to find a meeting by the starttime
@@ -111,7 +69,7 @@ public class RequestMeeting implements Command {
                 d = format.parse(identifier);
             }catch (java.text.ParseException e){
                 log.error(e.toString());
-                return;
+                return null;
             }
             Calendar cal = Calendar.getInstance();
             cal.setTime(d);
@@ -124,13 +82,11 @@ public class RequestMeeting implements Command {
             log.info( "" + upperLimit + lowerLimit);
 
             // Filter the meetings to be on the same day and within 16 minutes of the given timestamp
-            List<Meeting> meetings = ((List<Meeting>)meetRepository.findByWeekday(day)).stream()
+            meetings = meetings.stream()
                     .filter(m -> m.getStartTime().before(upperLimit) && m.getStartTime().after(lowerLimit))
                     .collect(Collectors.toList());
 
 
-            // Send the response
-            context.getChannel().sendMessage(meetResponse(meetings, subject)).queue();
         }
 
         // If the identifier is a number, then it is a group number
@@ -138,11 +94,9 @@ public class RequestMeeting implements Command {
             int groupNum = Integer.parseInt(identifier);
 
             // Filter the meetings by the group number. Lectures have the group number 0
-            List<Meeting> meetings = ((List<Meeting>) meetRepository.findByWeekday(day)).stream()
+            meetings = meetings.stream()
                     .filter(m -> m.getGroupNumber() == groupNum)
                     .collect(Collectors.toList());
-
-            context.getChannel().sendMessage(meetResponse(meetings, subject)).queue();
         }
 
         // Else it'll have to be a tutor's name
@@ -164,47 +118,35 @@ public class RequestMeeting implements Command {
             if (validTutor) {
 
                 // First filters everything out that has the group number 0, as those will not have a reftutorid
-                List<Meeting> meetings = ((List<Meeting>) meetRepository.findByWeekday(day)).stream()
+                meetings = meetings.stream()
                         .filter(m -> m.getGroupNumber()>0)
                         .filter(m -> tutRepository.findById(m.getRefTutorId()).getName().contains(identifier))
                         .collect(Collectors.toList());
 
-                context.getChannel().sendMessage(meetResponse(meetings, subject)).queue();
             }
 
             // If it doesn't, then it returns an error
             else {
-                context.getChannel().sendMessage("I could not find anything with your arguments. Please try again with diferent ones.").queue();
-            }
-        }*/
-
-    }
-
-    public List<String> getTypes() {
-        List<String> types = new ArrayList<>();
-        for (Professor prof: profRepository.findAll()) {
-            if (!types.contains(prof.getSubject())) {
-                types.add(prof.getSubject());
+                meetings = null;
             }
         }
-        return types;
+
+        return meetings;
     }
 
-    public String meetResponse(List<Meeting> meetings, String subject) {
-        /*// Convert to list to allow streaming
-        List<Meeting> meetingList = (List<Meeting>) meetings;
+    public static boolean isNum(String n) {
+        try {
+            double d = Double.parseDouble(n);
+        }
+        catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
 
-        // Grab a list of professors and of IDs
-        List<Professor> subjectProfs = (List<Professor>) profRepository.findBySubject(subject);
-        List<String> subjectProfsIDs = subjectProfs.stream()
-                .map(Professor::getId)
-                .collect(Collectors.toList());
+    public String meetResponse(List<Meeting> meetings) {
 
-        // Filter the meetingList by which meeting's professor's ID is on the list of subjectProfs IDs
-        meetingList = meetingList.stream()
-                .filter(m -> subjectProfsIDs.contains(m.getRefProfId()))
-                .collect(Collectors.toList());*/
-
+        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
         String response = "";
 
         if(meetings.size() == 0) {
@@ -222,18 +164,16 @@ public class RequestMeeting implements Command {
             String profName = profRepository.findById(m.getRefProfId()).getName();
             if (m.getRefTutorId() == null) {
 
-                response += "**__Lecture__**\n" + profName + " : " + m.getStartTime().toString() + "\n<" + m.getLink() + ">\n\n";
+                response += "**__Lecture__**\n" + profName + " : " + m.getStartTime().toString() + " - " + days[m.getWeekday()] + "\n<" + m.getLink() + ">\n\n";
             }
             else {
 
                 // Find the tutor for this tutoring
                 String tutName = tutRepository.findById(m.getRefTutorId()).getName();
-                response += "**__Tutoring__**\n" + tutName + " - " + profName + " : " + m.getStartTime().toString() + "\n" + "Group-ID: " + String.valueOf(m.getGroupNumber()) + "\n<" + m.getLink() + ">\n\n";
+                response += "**__Tutoring__**\n" + tutName + " - " + profName + " : " + m.getStartTime().toString() + " - " + days[m.getWeekday()] + "\n" + "Group-ID: " + String.valueOf(m.getGroupNumber()) + "\n<" + m.getLink() + ">\n\n";
             }
         }
 
         return response;
     }
-
-
 }

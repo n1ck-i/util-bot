@@ -22,7 +22,7 @@ public class Meeting {
 	@Column(name = "id", updatable = false, nullable = false)
 	private String id;
 
-	@Column(name = "refTutorId", nullable = false)
+	@Column(name = "refTutorId", nullable = true)
 	private String refTutorId;
 
 	@Column(name = "refProfId", nullable = false)
@@ -35,7 +35,7 @@ public class Meeting {
 	private String link;
 
 	@Column(name = "Weekday", nullable = false)
-	private Integer weekday;
+	private int weekday;
 
 	@Column(name = "StartTime", nullable = false)
 	private Time startTime;
@@ -80,11 +80,11 @@ public class Meeting {
 		this.link = link;
 	}
 
-	public Integer getWeekday() {
+	public int getWeekday() {
 		return weekday;
 	}
 
-	public void setWeekday(Integer weekday) {
+	public void setWeekday(int weekday) {
 		this.weekday = weekday;
 	}
 
@@ -99,7 +99,7 @@ public class Meeting {
 	@Override
 	public String toString() {
 		return MessageFormat.format("Meeting[id={0}, refTutorId={1}, refProfId={2}, " +
-						"GroupNumber={3}, Link={4}, weekday={5}, starttime={6}]",
+				"GroupNumber={3}, Link={4}, weekday={5}, starttime={6}]",
 				this.id,
 				this.refTutorId,
 				this.refProfId,

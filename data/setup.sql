@@ -7,7 +7,7 @@ CREATE TABLE `ubot`.`Professor` (
 	`id` VARCHAR(40) NOT NULL,
 	`Name` VARCHAR(50) NOT NULL,
 	`Subject` VARCHAR(20) NOT NULL,
-	`ChanelId` VARCHAR(50) NOT NULL,
+	`ChannelId` VARCHAR(50) NOT NULL,
 	PRIMARY KEY (`id`));
 
 CREATE TABLE `ubot`.`Meeting` (

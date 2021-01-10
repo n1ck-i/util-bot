@@ -1,5 +1,7 @@
 package org.ub.utilbot.commands;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -10,9 +12,9 @@ import org.ub.utilbot.commandutils.CommandContext;
 import org.ub.utilbot.commandutils.MeetUtils;
 import org.ub.utilbot.entities.Meeting;
 import org.ub.utilbot.entities.Professor;
-import org.ub.utilbot.repositories.MeetingRepository;
-import org.ub.utilbot.repositories.ProfessorRepository;
-import org.ub.utilbot.repositories.TutorRepository;
+import org.ub.utilbot.entities.User;
+import org.ub.utilbot.entities.UserToMeeting;
+import org.ub.utilbot.repositories.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +25,17 @@ import java.util.stream.Collectors;
 @Component
 public class RemindCommand implements Command, ApplicationContextAware {
 
+    String[] days = {"Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+
+    private final Logger log = LogManager.getLogger(RemindCommand.class);
+
     private ApplicationContext appContext;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private UserToMeetingRepository utoRepository;
 
     @Override
     public String getName() {
@@ -62,23 +74,71 @@ public class RemindCommand implements Command, ApplicationContextAware {
 
         String identifier = String.join(" ", Arrays.copyOfRange(context.getArgs(),1,context.getArgs().length));
 
-        int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2) % 7;
+        int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) % 7;
         //new MeetUtils(profRepository,meetRepository,tutRepository);
         List<Meeting> meetings = util.getMeetings(subject,identifier,day);
 
         if (meetings.size() == 0) {
-            //TODO Send message that there was no meeting fitting the query
+
             String response = "I could not find any fitting meetings for your response. Maybe try using group numbers for tutorings or just the subject alone for lectures.";
             context.getChannel().sendMessage(response).queue();
         }
         else if (meetings.size() == 1) {
-            //TODO Sign up and send message
-            String response = meetings.get(0).toString();
+            Meeting m = meetings.get(0);
+            // Checks if the user is already in the database
+            List<User> users = ((List<User>) userRepository.findAll()).stream()
+                    .filter(u -> u.getDiscordId().equals(context.getMember().getId()))
+                    .collect(Collectors.toList());
 
+            if (users.size() == 0) {
+                User u = new User();
+                u.setDiscordId(context.getMember().getId());
+
+                u = userRepository.save(u);
+                users.add(u);
+                log.info("Added User to database: " + u.toString());
+            }
+            User user = users.get(0);
+
+            // Add UserToMeeting mapping to database
+            UserToMeeting uto = new UserToMeeting();
+            uto.setRefMeetingId(m.getId());
+            uto.setRefUserId(user.getId());
+
+            uto = utoRepository.save(uto);
+            log.info("Added UserToMeeting instance: " + uto.toString());
+
+
+            String response = "I signed you up to be reminded for " + subject + " at " + m.getStartTime() + " on " + days[m.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + uto.getId() + "`";
+            context.getChannel().sendMessage(response).queue();
         }
         // If all meetings are lectures are lectures
         else if (meetings.stream().allMatch(m -> m.getRefTutorId() == null)) {
-            //TODO Sign up and send message
+
+            // Checks if the user is already in the database
+            List<User> users = ((List<User>) userRepository.findAll()).stream()
+                    .filter(u -> u.getDiscordId().equals(context.getMember().getId()))
+                    .collect(Collectors.toList());
+
+            if (users.size() == 0) {
+                User u = new User();
+                u.setDiscordId(context.getMember().getId());
+
+                u = userRepository.save(u);
+                users.add(u);
+                log.info("Added User to database: " + u.toString());
+            }
+            User user = users.get(0);
+            for (Meeting meet: meetings) {
+                UserToMeeting uto = new UserToMeeting();
+                uto.setRefMeetingId(meet.getId());
+                uto.setRefUserId(user.getId());
+
+                uto = utoRepository.save(uto);
+                log.info("Added UserToMeeting instance: " + uto.toString());
+                String response = "I signed you up to be reminded for " + subject + " at " + meet.getStartTime() + " on " + days[meet.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + uto.getId() + "`";
+                context.getChannel().sendMessage(response).queue();
+            }
         }
         // It's not exact enough. Return the list and instructions on how to make it more exact
         else {

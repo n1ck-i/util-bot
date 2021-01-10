@@ -140,7 +140,7 @@ public class MeetUtils {
 
     public String meetResponse(List<Meeting> meetings) {
 
-        String[] days = {"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"};
+        String[] days = {"Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
         String response = "";
 
         if(meetings.size() == 0) {

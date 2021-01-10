@@ -64,7 +64,7 @@ public class RequestMeeting implements Command, ApplicationContextAware {
 
         String identifier = String.join(" ", Arrays.copyOfRange(context.getArgs(),1,context.getArgs().length));
 
-        int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2) % 7;
+        int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) % 7;
         //new MeetUtils(profRepository,meetRepository,tutRepository);
         context.getChannel().sendMessage(util.meetResponse(util.getMeetings(subject,identifier,day))).queue();
 

@@ -13,10 +13,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import org.ub.utilbot.commands.ExampleCommand;
-import org.ub.utilbot.commands.RemindCommand;
-import org.ub.utilbot.commands.RepositoryAccess;
-import org.ub.utilbot.commands.RequestMeeting;
+import org.ub.utilbot.commands.*;
 import org.ub.utilbot.commandutils.CommandManager;
 import org.ub.utilbot.commandutils.MessageReceivedListener;
 
@@ -45,6 +42,7 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
         //CommandManager.registerCommand(new ExampleCommand());
         CommandManager.registerCommand(appContext.getBean(RepositoryAccess.class));
         CommandManager.registerCommand(appContext.getBean(RemindCommand.class));
+        CommandManager.registerCommand(appContext.getBean(RemoveCommand.class));
         CommandManager.registerCommand(appContext.getBean(RequestMeeting.class));
     }
 

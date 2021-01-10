@@ -20,20 +20,14 @@ import java.util.stream.Collectors;
 
 @Component
 public class MeetUtils {
-
+    @Autowired
     private ProfessorRepository profRepository;
-
+    @Autowired
     private MeetingRepository meetRepository;
-
+    @Autowired
     private TutorRepository tutRepository;
 
     private final Logger log = LogManager.getLogger(MeetUtils.class);
-
-    public MeetUtils(ProfessorRepository profRepository, MeetingRepository meetRepository, TutorRepository tutRepository) {
-        this.profRepository = profRepository;
-        this.meetRepository = meetRepository;
-        this.tutRepository = tutRepository;
-    }
 
     public List<Meeting> getMeetings(String subject, String identifier, int day) {
         // Grab a list of professors and of IDs
@@ -175,5 +169,15 @@ public class MeetUtils {
         }
 
         return response;
+    }
+
+    public List<String> getTypes() {
+        List<String> types = new ArrayList<>();
+        for (Professor prof: profRepository.findAll()) {
+            if (!types.contains(prof.getSubject())) {
+                types.add(prof.getSubject());
+            }
+        }
+        return types;
     }
 }

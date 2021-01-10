@@ -1,6 +1,9 @@
 package org.ub.utilbot.commands;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
@@ -18,15 +21,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class RemindCommand implements Command{
-    @Autowired
-    private ProfessorRepository profRepository;
+public class RemindCommand implements Command, ApplicationContextAware {
 
-    @Autowired
-    private MeetingRepository meetRepository;
-
-    @Autowired
-    private TutorRepository tutRepository;
+    private ApplicationContext appContext;
 
     @Override
     public String getName() {
@@ -45,6 +42,8 @@ public class RemindCommand implements Command{
 
     @Override
     public void onCommand(CommandContext context) {
+        MeetUtils util = appContext.getBean(MeetUtils.class);
+
         // Checks if there are arguments present
         if (context.getArgs().length == 0) {
             context.getChannel().sendMessage("I need arguments to figure out which meetings you want information for.\nThe usage is as follows: `!meeting [subject] [identifier]`").queue();
@@ -52,7 +51,7 @@ public class RemindCommand implements Command{
         }
 
         // Checks if the first argument is a valid subject
-        List<String> types = getTypes();
+        List<String> types = util.getTypes();
         if (!types.contains(context.getArgs()[0])) {
             context.getChannel().sendMessage("Please give me the subject you want me to get the lectures for first. It should be one of these: " + types.toString()).queue();
             return;
@@ -64,7 +63,7 @@ public class RemindCommand implements Command{
         String identifier = String.join(" ", Arrays.copyOfRange(context.getArgs(),1,context.getArgs().length));
 
         int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 2) % 7;
-        MeetUtils util = new MeetUtils(profRepository,meetRepository,tutRepository);
+        //new MeetUtils(profRepository,meetRepository,tutRepository);
         List<Meeting> meetings = util.getMeetings(subject,identifier,day);
 
         if (meetings.size() == 0) {
@@ -88,13 +87,8 @@ public class RemindCommand implements Command{
         }
     }
 
-    public List<String> getTypes() {
-        List<String> types = new ArrayList<>();
-        for (Professor prof: profRepository.findAll()) {
-            if (!types.contains(prof.getSubject())) {
-                types.add(prof.getSubject());
-            }
-        }
-        return types;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.appContext = applicationContext;
     }
 }

@@ -24,7 +24,7 @@ class DelayTimer implements CommandLineRunner, ApplicationContextAware {
 
         //Delay in Milliseconds * 1000 -> 15 Min
         long delay;
-        delay = 5 * 1000;
+        delay = 1800 * 1000;
 
 
         Reminder reminder = appContext.getBean(Reminder.class);

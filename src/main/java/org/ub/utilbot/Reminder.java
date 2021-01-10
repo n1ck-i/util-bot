@@ -48,14 +48,14 @@ public class Reminder implements ApplicationContextAware {
         Calendar cal = Calendar.getInstance();
         cal.setTime(Time.valueOf(LocalTime.now()));
 
-        // Get the upper and lower limit for a span of 32 minutes around the given timestamp
-        cal.add(Calendar.MINUTE, 16);
+        // Get the upper and lower limit for a span of 30 minutes around the given timestamp
+        cal.add(Calendar.MINUTE, 0);
         Time upperLimit = new Time(cal.getTimeInMillis());
-        cal.add(Calendar.MINUTE, -32);
+        cal.add(Calendar.MINUTE, -30);
         Time lowerLimit = new Time(cal.getTimeInMillis());
         log.info( "" + upperLimit + lowerLimit);
 
-        // Filter the meetings to be on the same day and within 16 minutes of the given timestamp
+        // Filter the meetings to be on the same day and within 30 minutes of the given timestamp
         List<Meeting> meetings = ((List<Meeting>)meetRepository.findByWeekday(day)).stream()
                 .filter(m -> m.getStartTime().before(upperLimit) && m.getStartTime().after(lowerLimit))
                 .collect(Collectors.toList());
@@ -94,7 +94,7 @@ public class Reminder implements ApplicationContextAware {
                 }
 
                 else{
-                    message = "@" + user.getName() + " du hast bald ein Tutorium!" + "Hier ist der Link: " + link;
+                    message = "@" + user.getName() + " du hast bald ein Tutorium! " + "Hier ist der Link: " + link;
                     log.info("Message made for " + user.getName());
                 }
 

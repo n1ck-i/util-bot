@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import java.text.MessageFormat;
+
 @Entity(name = "User")
 public class User {
 
@@ -40,7 +42,7 @@ public class User {
 
 	@Override
 	public String toString() {
-		return "User[id=%s, discordId=%s]".formatted(this.id, this.discordId);
+		return MessageFormat.format("User[id={0}, discordId={1}]", this.id, this.discordId);
 	}
 
 }

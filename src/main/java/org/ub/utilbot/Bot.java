@@ -52,8 +52,12 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
         log.info("Destroyed");
     }
 
+    public JDA getClient() {
+        return client;
+    }
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.appContext = applicationContext;
+            this.appContext = applicationContext;
+
     }
 }

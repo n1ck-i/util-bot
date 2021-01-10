@@ -7,6 +7,8 @@ import javax.persistence.Id;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import java.text.MessageFormat;
+
 @Entity(name = "UserToMeeting")
 public class UserToMeeting {
 
@@ -51,8 +53,8 @@ public class UserToMeeting {
 
 	@Override
 	public String toString() {
-		return "UserToMeeting[id=%s, refUserId=%s, refMeetingId=%s]"
-			.formatted(this.id, this.refUserId, this.refMeetingId);
+		return MessageFormat.format("UserToMeeting[id={0}, refUserId={1}, refMeetingId={2}]",
+				this.id, this.refUserId, this.refMeetingId);
 	}
 
 }

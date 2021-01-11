@@ -1,5 +1,14 @@
 package org.ub.utilbot.commands;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,12 +21,6 @@ import org.ub.utilbot.entities.Tutor;
 import org.ub.utilbot.repositories.MeetingRepository;
 import org.ub.utilbot.repositories.ProfessorRepository;
 import org.ub.utilbot.repositories.TutorRepository;
-
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @Component
 public class RepositoryAccess implements Command {

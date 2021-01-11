@@ -31,12 +31,15 @@ public class HelpCommand implements Command {
 
 		log.info("Help command invoked");
 
+		// send a generic welcome message if on arguments are provided
+		// or the provided arg is not "help"
 		if (context.getArgs().length == 0 || !context.getArgs()[0].equals("help")) {
 			log.warn("Default welcome msg");
 			context.getChannel().sendMessage("Hello :salute:\n" + "For more info on available commands try '!ubot help'").queue();
 			return;
 		}
 
+		// send help message
 		log.info("Sending help");
 		context.getChannel().sendMessage(
 				"The Util Bot provides the following commands to help you find your online lectures and exercises on time.\n\n" +

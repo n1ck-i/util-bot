@@ -6,4 +6,4 @@ build:
 	mvn clean install
 
 run:
-	java -jar ./target/util-bot-0.1.jar
+	TOKEN="$(token)" java -jar ./target/util-bot-0.1.jar

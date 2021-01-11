@@ -1,28 +1,30 @@
-package org.ub.utilbot;
+package org.ub.utilbot.reminder;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.User;
-import org.apache.logging.log4j.LogManager;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import java.sql.Time;
-import java.time.*;
-import java.util.ArrayList;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.security.auth.login.LoginException;
+
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.ub.utilbot.Bot;
 import org.ub.utilbot.entities.Meeting;
 import org.ub.utilbot.entities.UserToMeeting;
 import org.ub.utilbot.repositories.MeetingRepository;
 import org.ub.utilbot.repositories.UserRepository;
 import org.ub.utilbot.repositories.UserToMeetingRepository;
-import javax.security.auth.login.LoginException;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
 @Component
 
 public class Reminder implements ApplicationContextAware {
@@ -53,7 +55,7 @@ public class Reminder implements ApplicationContextAware {
         Time lowerLimit = new Time(cal.getTimeInMillis());
         cal.add(Calendar.MINUTE, 30);
         Time upperLimit = new Time(cal.getTimeInMillis());
-        log.info( "" + upperLimit + lowerLimit);
+        log.info( "" + upperLimit + " - " + lowerLimit);
         log.info("starting to sort meetings");
 
         // Filter the meetings to be on the same day and within 30 minutes of the given timestamp
@@ -67,13 +69,13 @@ public class Reminder implements ApplicationContextAware {
             log.warn("No Meetings found.");
             return;
         }
-        //get bot class
+
         JDA jda = this.appContext.getBean(Bot.class).getClient();
 
         //Find relevent User Discord IDs and send messages in for loop (iterating over the relevent meetings)
         for(Meeting m : meetings) {
 
-            //Grab the uto database elements
+            //Grab the utm database elements
             log.info("Grabbing user database elements");
             //grab the users
             List<User> users =
@@ -88,29 +90,28 @@ public class Reminder implements ApplicationContextAware {
                 // Content for the messages and declare variable message
                 String link = m.getLink();
                 String message;
-                log.info("In for loop now");
-                //check if meeting has refTutorID to filter the vorlesung and tutorium
+                //check if meeting has refTutorID to filter the lectures from exercises
                 if(m.getRefTutorId() == null){
                     message = "@" + user.getName() + "" + "one of your lectures will begin soon! " + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
-                }
 
-                else{
+                } else {
                     message = "@" + user.getName() + " one of your exercises will begin soon! " + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
+
                 }
 
                 // Open DM with User and send message
                 try {
                     user.openPrivateChannel().queue((channel) -> {channel.sendMessage(message).queue();});
                     log.info("Message sent to " + user.getName());
-                }
-                catch(Exception e) {
+
+                } catch(Exception e) {
                     log.error("Bot could not send DM to User " + user.getName() + Arrays.toString(e.getStackTrace()));
-                }
                 }
             }
         }
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

@@ -34,13 +34,13 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
 
     @Override
     public void run(String... args) throws Exception {
+        // establish connection to discord api
         client = JDABuilder.createDefault(token).build();
         client.addEventListener(new MessageReceivedListener());
 
         log.info("Bot started.");
 
-        //CommandManager.registerCommand(new ExampleCommand());
-        CommandManager.registerCommand(appContext.getBean(RepositoryAccess.class));
+        // register available commands
         CommandManager.registerCommand(appContext.getBean(RemindCommand.class));
         CommandManager.registerCommand(appContext.getBean(RemoveCommand.class));
         CommandManager.registerCommand(appContext.getBean(RequestMeeting.class));
@@ -56,6 +56,7 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
     public JDA getClient() {
         return client;
     }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
             this.appContext = applicationContext;

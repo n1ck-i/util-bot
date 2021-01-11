@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
 import org.ub.utilbot.entities.Meeting;
+import org.ub.utilbot.entities.User;
 import org.ub.utilbot.entities.UserToMeeting;
 import org.ub.utilbot.repositories.MeetingRepository;
 import org.ub.utilbot.repositories.ProfessorRepository;
@@ -56,9 +57,9 @@ public class RemoveCommand implements Command {
 
         if (exists) {
             UserToMeeting utoElement = utoRepository.findById(context.getArgs()[0]);
-            String userRepoID = userRepository.findByDiscordId(context.getMember().getId()).getId();
+            User user = userRepository.findByDiscordId(context.getMember().getId());
             // Checks if the reminder is by the given user
-            if (userRepoID.equals(utoElement.getRefUserId())) {
+            if (user != null &&user.getId().equals(utoElement.getRefUserId())) {
 
                 Meeting meeting = meetingRepository.findById(utoRepository.findById(context.getArgs()[0]).getRefMeetingId());
                 String subject = professorRepository.findById(meeting.getRefProfId()).getSubject();

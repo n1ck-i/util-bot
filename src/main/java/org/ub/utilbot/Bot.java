@@ -44,6 +44,7 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
         CommandManager.registerCommand(appContext.getBean(RemindCommand.class));
         CommandManager.registerCommand(appContext.getBean(RemoveCommand.class));
         CommandManager.registerCommand(appContext.getBean(RequestMeeting.class));
+        CommandManager.registerCommand(appContext.getBean(HelpCommand.class));
     }
 
     @PreDestroy

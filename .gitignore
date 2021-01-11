@@ -32,3 +32,6 @@ build/
 
 ### Vim/NVim ###
 **/*.swp
+
+### logs ###
+logs/

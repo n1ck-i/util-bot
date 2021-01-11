@@ -1,27 +1,21 @@
 package org.ub.utilbot.commands;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
 import org.ub.utilbot.commandutils.MeetUtils;
-import org.ub.utilbot.entities.Professor;
-import org.ub.utilbot.repositories.ProfessorRepository;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
 
 @Component
 public class RequestMeeting implements Command, ApplicationContextAware {
-    @Autowired
-    private ProfessorRepository profRepository;
 
     private final Logger log = LogManager.getLogger(RequestMeeting.class);
 
@@ -46,8 +40,11 @@ public class RequestMeeting implements Command, ApplicationContextAware {
     public void onCommand(CommandContext context) {
         MeetUtils util = appContext.getBean(MeetUtils.class);
 
+        log.info("Meeting requested by user(" + context.getMember().getId() + ") with args: " + String.join(",", context.getArgs()));
+
         // Checks if there are arguments present
         if (context.getArgs().length == 0) {
+            log.info("No argument supplied");
             context.getChannel().sendMessage("I need arguments to figure out which meetings you want information for.\nThe usage is as follows: `!meeting [subject] [identifier]`").queue();
             return;
         }
@@ -55,6 +52,7 @@ public class RequestMeeting implements Command, ApplicationContextAware {
         // Checks if the first argument is a valid subject
         List<String> types = util.getTypes();
         if (!types.contains(context.getArgs()[0])) {
+            log.info("Invalid subject supplied");
             context.getChannel().sendMessage("Please give me the subject you want me to get the lectures for first. It should be one of these: " + types.toString()).queue();
             return;
         }

@@ -1,5 +1,10 @@
 package org.ub.utilbot.commands;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -11,16 +16,10 @@ import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
 import org.ub.utilbot.commandutils.MeetUtils;
 import org.ub.utilbot.entities.Meeting;
-import org.ub.utilbot.entities.Professor;
 import org.ub.utilbot.entities.User;
 import org.ub.utilbot.entities.UserToMeeting;
-import org.ub.utilbot.repositories.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.List;
-import java.util.stream.Collectors;
+import org.ub.utilbot.repositories.UserRepository;
+import org.ub.utilbot.repositories.UserToMeetingRepository;
 
 @Component
 public class RemindCommand implements Command, ApplicationContextAware {
@@ -35,7 +34,7 @@ public class RemindCommand implements Command, ApplicationContextAware {
     private UserRepository userRepository;
 
     @Autowired
-    private UserToMeetingRepository utoRepository;
+    private UserToMeetingRepository utmRepository;
 
     @Override
     public String getName() {
@@ -75,76 +74,74 @@ public class RemindCommand implements Command, ApplicationContextAware {
         String identifier = String.join(" ", Arrays.copyOfRange(context.getArgs(),1,context.getArgs().length));
 
         int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) % 7;
-        //new MeetUtils(profRepository,meetRepository,tutRepository);
         List<Meeting> meetings = util.getMeetings(subject,identifier,day);
 
         if (meetings.size() == 0) {
 
+            log.warn("No meetings found for, subject: " + subject + ", day: " + day + ", identifier: " + identifier);
             String response = "I could not find any fitting meetings for your response. Maybe try using group numbers for tutorings or just the subject alone for lectures.";
             context.getChannel().sendMessage(response).queue();
-        }
-        else if (meetings.size() == 1) {
+
+        } else if (meetings.size() == 1) {
             Meeting m = meetings.get(0);
-            // Checks if the user is already in the database
-            List<User> users = ((List<User>) userRepository.findAll()).stream()
-                    .filter(u -> u.getDiscordId().equals(context.getMember().getId()))
-                    .collect(Collectors.toList());
 
-            if (users.size() == 0) {
-                User u = new User();
-                u.setDiscordId(context.getMember().getId());
-
-                u = userRepository.save(u);
-                users.add(u);
-                log.info("Added User to database: " + u.toString());
-            }
-            User user = users.get(0);
+            User user = this.checkForUser(context.getMember().getId());
 
             // Add UserToMeeting mapping to database
-            UserToMeeting uto = new UserToMeeting();
-            uto.setRefMeetingId(m.getId());
-            uto.setRefUserId(user.getId());
+            UserToMeeting utm = new UserToMeeting();
+            utm.setRefMeetingId(m.getId());
+            utm.setRefUserId(user.getId());
 
-            uto = utoRepository.save(uto);
-            log.info("Added UserToMeeting instance: " + uto.toString());
+            utm = utmRepository.save(utm);
+            log.info("Added UserToMeeting instance: " + utm.toString());
 
 
-            String response = "I signed you up to be reminded for " + subject + " at " + m.getStartTime() + " on " + days[m.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + uto.getId() + "`";
+            String response = "I signed you up to be reminded for " + subject + " at " + m.getStartTime() + " on " 
+                + days[m.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + utm.getId() + "`";
             context.getChannel().sendMessage(response).queue();
-        }
-        // If all meetings are lectures are lectures
-        else if (meetings.stream().allMatch(m -> m.getRefTutorId() == null)) {
 
-            // Checks if the user is already in the database
-            List<User> users = ((List<User>) userRepository.findAll()).stream()
-                    .filter(u -> u.getDiscordId().equals(context.getMember().getId()))
-                    .collect(Collectors.toList());
 
-            if (users.size() == 0) {
-                User u = new User();
-                u.setDiscordId(context.getMember().getId());
+        } else if (meetings.stream().allMatch(m -> m.getRefTutorId() == null)) {
+            // If all meetings are lectures 
 
-                u = userRepository.save(u);
-                users.add(u);
-                log.info("Added User to database: " + u.toString());
-            }
-            User user = users.get(0);
+            User user = this.checkForUser(context.getMember().getId());
+
             for (Meeting meet: meetings) {
-                UserToMeeting uto = new UserToMeeting();
-                uto.setRefMeetingId(meet.getId());
-                uto.setRefUserId(user.getId());
+                UserToMeeting utm = new UserToMeeting();
+                utm.setRefMeetingId(meet.getId());
+                utm.setRefUserId(user.getId());
 
-                uto = utoRepository.save(uto);
-                log.info("Added UserToMeeting instance: " + uto.toString());
-                String response = "I signed you up to be reminded for " + subject + " at " + meet.getStartTime() + " on " + days[meet.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + uto.getId() + "`";
+                utm = utmRepository.save(utm);
+                log.info("Added UserToMeeting instance: " + utm.toString());
+                String response = "I signed you up to be reminded for " + subject + " at " + meet.getStartTime() 
+                    + " on " + days[meet.getWeekday()] + ".\nTo remove this reminder, please run the command `!remove " + utm.getId() + "`";
                 context.getChannel().sendMessage(response).queue();
             }
-        }
-        // It's not exact enough. Return the list and instructions on how to make it more exact
-        else {
-            String response = "The request isn't exact enough. There are several meetings that could be meant. Please use the group number as an identifier for a tutoring or leave the identifier blank to sign up for the lecture.\n" + util.meetResponse(meetings);
+
+        } else {
+            // It's not exact enough. Return the list and instructions on how to make it more exact
+            String response = "The request isn't exact enough. There are several meetings that could be meant. " + 
+                "Please use the group number as an identifier for a tutoring or leave the identifier blank to sign up for the lecture.\n"
+                + util.meetResponse(meetings);
             context.getChannel().sendMessage(response).queue();
         }
+    }
+
+    // Checks if the user is already in the database
+    // otherwise saves him to the db
+    private User checkForUser(String id) {
+        User user = userRepository.findByDiscordId(id);
+
+        // save user to db if he doesn't already exist
+        if (user == null) {
+            User u = new User();
+            u.setDiscordId(id);
+
+            u = userRepository.save(u);
+            user = u;
+            log.info("Added User to database: " + u.toString());
+        }
+        return user;
     }
 
     @Override

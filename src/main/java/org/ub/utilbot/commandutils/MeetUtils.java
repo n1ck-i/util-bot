@@ -1,22 +1,26 @@
 package org.ub.utilbot.commandutils;
 
+import java.sql.Time;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.ub.utilbot.commands.RequestMeeting;
 import org.ub.utilbot.entities.Meeting;
 import org.ub.utilbot.entities.Professor;
 import org.ub.utilbot.entities.Tutor;
 import org.ub.utilbot.repositories.MeetingRepository;
 import org.ub.utilbot.repositories.ProfessorRepository;
 import org.ub.utilbot.repositories.TutorRepository;
-
-import java.sql.Time;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 public class MeetUtils {
@@ -46,16 +50,14 @@ public class MeetUtils {
             meetings = meetings.stream()
                     .filter(m -> m.getRefTutorId() == null)
                     .collect(Collectors.toList());
-        }
 
-        // Lists all of today's lectures and tutorings for the selected subject
-        else if (identifier.equalsIgnoreCase("list")) {
+        } else if (identifier.equalsIgnoreCase("list")) {
+            // Lists all of today's lectures and tutorings for the selected subject
             meetings = meetings.stream().filter(m -> m.getWeekday() == day).collect(Collectors.toList());
 
-        }
+        } else if (identifier.contains(":")) {
+            // If the user wants to find a meeting by the starttime
 
-        // If the user wants to find a meeting by the starttime
-        else if (identifier.contains(":")) {
             // Convert the timestamp into a Calendar object
             DateFormat format = new SimpleDateFormat("kk:mm", Locale.GERMAN);
             Date d;
@@ -81,20 +83,17 @@ public class MeetUtils {
                     .collect(Collectors.toList());
 
 
-        }
-
-        // If the identifier is a number, then it is a group number
-        else if(isNum(identifier)) {
+        } else if(isInt(identifier)) {
+            // If the identifier is a number, then it is a group number
             int groupNum = Integer.parseInt(identifier);
 
             // Filter the meetings by the group number. Lectures have the group number 0
             meetings = meetings.stream()
                     .filter(m -> m.getGroupNumber() == groupNum)
                     .collect(Collectors.toList());
-        }
 
-        // Else it'll have to be a tutor's name
-        else {
+        } else {
+            // Else it'll have to be a tutor's name
             List<String> tutorNames = ((List<Tutor>) tutRepository.findAll()).stream()
                     .map(Tutor::getName)
                     .collect(Collectors.toList());
@@ -117,10 +116,8 @@ public class MeetUtils {
                         .filter(m -> tutRepository.findById(m.getRefTutorId()).getName().contains(identifier))
                         .collect(Collectors.toList());
 
-            }
-
-            // If it doesn't, then it returns an error
-            else {
+            } else {
+                // If it doesn't, then it returns an error
                 meetings = null;
             }
         }
@@ -128,9 +125,9 @@ public class MeetUtils {
         return meetings;
     }
 
-    public static boolean isNum(String n) {
+    public static boolean isInt(String n) {
         try {
-            double d = Double.parseDouble(n);
+            Integer.parseInt(n);
         }
         catch (NumberFormatException e) {
             return false;
@@ -158,19 +155,23 @@ public class MeetUtils {
             String profName = profRepository.findById(m.getRefProfId()).getName();
             if (m.getRefTutorId() == null) {
 
-                response += "**__Lecture__**\n" + profName + " : " + m.getStartTime().toString() + " - " + days[m.getWeekday()] + "\n<" + m.getLink() + ">\n\n";
+                response += "**__Lecture__**\n" + profName + " : " + m.getStartTime().toString()
+                    + " - " + days[m.getWeekday()] + "\n<" + m.getLink() + ">\n\n";
             }
             else {
 
                 // Find the tutor for this tutoring
                 String tutName = tutRepository.findById(m.getRefTutorId()).getName();
-                response += "**__Tutoring__**\n" + tutName + " - " + profName + " : " + m.getStartTime().toString() + " - " + days[m.getWeekday()] + "\n" + "Group-ID: " + String.valueOf(m.getGroupNumber()) + "\n<" + m.getLink() + ">\n\n";
+                response += "**__Exercise__**\n" + tutName + " - " + profName + " : " +
+                    m.getStartTime().toString()+ " - " + days[m.getWeekday()] + "\n" + "Group-ID: " +
+                    String.valueOf(m.getGroupNumber()) + "\n<" + m.getLink() + ">\n\n";
             }
         }
 
         return response;
     }
 
+    // returns a list of available subjects
     public List<String> getTypes() {
         List<String> types = new ArrayList<>();
         for (Professor prof: profRepository.findAll()) {

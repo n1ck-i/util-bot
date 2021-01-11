@@ -42,7 +42,7 @@ public class Reminder implements ApplicationContextAware {
     public void remind() throws LoginException {
         //Get current day in int
         int day = (Calendar.getInstance().get(Calendar.DAY_OF_WEEK) - 1) % 7;
-        log.info(day);
+        log.info("This is the Day: " + day);
 
 
         Calendar cal = Calendar.getInstance();
@@ -50,15 +50,17 @@ public class Reminder implements ApplicationContextAware {
 
         // Get the upper and lower limit for a span of 30 minutes around the given timestamp
         cal.add(Calendar.MINUTE, 0);
-        Time upperLimit = new Time(cal.getTimeInMillis());
-        cal.add(Calendar.MINUTE, -30);
         Time lowerLimit = new Time(cal.getTimeInMillis());
+        cal.add(Calendar.MINUTE, 30);
+        Time upperLimit = new Time(cal.getTimeInMillis());
         log.info( "" + upperLimit + lowerLimit);
+        log.info("starting to sort meetings");
 
         // Filter the meetings to be on the same day and within 30 minutes of the given timestamp
         List<Meeting> meetings = ((List<Meeting>)meetRepository.findByWeekday(day)).stream()
                 .filter(m -> m.getStartTime().before(upperLimit) && m.getStartTime().after(lowerLimit))
                 .collect(Collectors.toList());
+        log.info("Finished sorting Meetings" + meetings.size());
 
         //Check if meetings exist
         if(meetings.size() == 0){
@@ -89,12 +91,12 @@ public class Reminder implements ApplicationContextAware {
                 log.info("In for loop now");
                 //check if meeting has refTutorID to filter the vorlesung and tutorium
                 if(m.getRefTutorId() == null){
-                    message = "@" + user.getName() + "" + "du hast bald eine Vorlesung! " + "Hier ist der Link: " + link;
+                    message = "@" + user.getName() + "" + "one of your lectures will begin soon! " + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
                 }
 
                 else{
-                    message = "@" + user.getName() + " du hast bald ein Tutorium! " + "Hier ist der Link: " + link;
+                    message = "@" + user.getName() + " one of your exercises will begin soon! " + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
                 }
 
@@ -115,4 +117,3 @@ public class Reminder implements ApplicationContextAware {
         this.appContext = applicationContext;
     }
 }
-

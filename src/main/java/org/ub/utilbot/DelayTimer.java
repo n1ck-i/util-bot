@@ -22,7 +22,7 @@ class DelayTimer implements CommandLineRunner, ApplicationContextAware {
     @Override
     public void run(String... args) throws Exception {
 
-        //Delay in Milliseconds * 1000 -> 15 Min
+        //Delay in 1800 milliseconds * 1000 -> 30 Min
         long delay;
         delay = 1800 * 1000;
 
@@ -42,7 +42,7 @@ class DelayTimer implements CommandLineRunner, ApplicationContextAware {
             }
         };
         log.info("Starting schedule");
-        timer.schedule(task, delay);
+        timer.schedule(task, delay, delay);
     }
 
     @Override

@@ -50,7 +50,11 @@ public class HelpCommand implements Command {
 				"\n\n" +
 				"Remind command: " + new RemindCommand().getUsage() +
 				"\n    With the remind command you can select lectures/exercises similar to how you request meetings and can then subscribe to them." +
-				"\n    You will then be notified each time shortly before the lecture/exercise starts with the link to join."
+				"\n    You will then be notified each time shortly before the lecture/exercise starts with the link to join." +
+				"\n\n" +
+				"Remove command: " + new RemoveCommand().getUsage() +
+				"\n    With the remove command you can unsubscribe to an existing reminder." +
+				"\n    Also when you subscribe to a reminder the bot will send you a command you can easily copy paste to unsubscribe."
 				).queue();
 	}
 

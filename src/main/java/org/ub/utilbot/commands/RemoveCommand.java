@@ -59,7 +59,7 @@ public class RemoveCommand implements Command {
             UserToMeeting utoElement = utoRepository.findById(context.getArgs()[0]);
             User user = userRepository.findByDiscordId(context.getMember().getId());
             // Checks if the reminder is by the given user
-            if (user != null &&user.getId().equals(utoElement.getRefUserId())) {
+            if (user != null && user.getId().equals(utoElement.getRefUserId())) {
 
                 Meeting meeting = meetingRepository.findById(utoRepository.findById(context.getArgs()[0]).getRefMeetingId());
                 String subject = professorRepository.findById(meeting.getRefProfId()).getSubject();

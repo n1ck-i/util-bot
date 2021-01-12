@@ -10,5 +10,6 @@ public interface MeetingRepository extends CrudRepository<Meeting, Integer> {
 	Meeting findById(String id);
 	Iterable<Meeting> findByWeekday(int weekday);
 	Iterable<Meeting> findByStartTime(Time startTime);
+	Iterable<Meeting> findByRefProfId(String refProfId);
 	Iterable<Meeting> findAll();
 }

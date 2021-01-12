@@ -104,6 +104,10 @@ public class RemindCommand implements Command, ApplicationContextAware {
             Meeting m = meetings.get(0);
 
             User user = this.checkForUser(context.getMessage().getAuthor().getId());
+            if (checkForExistingReminder(m.getId(),user.getId())) {
+                context.getChannel().sendMessage("You are already being reminded for this meeting.").queue();
+                return;
+            }
 
             // Add UserToMeeting mapping to database
             UserToMeeting utm = new UserToMeeting();
@@ -126,6 +130,10 @@ public class RemindCommand implements Command, ApplicationContextAware {
 
             String response = "";
             for (Meeting meet: meetings) {
+                if (checkForExistingReminder(meet.getId(),user.getId())) {
+                    context.getChannel().sendMessage("You are already being reminded for this meeting.").queue();
+                    continue;
+                }
                 UserToMeeting utm = new UserToMeeting();
                 utm.setRefMeetingId(meet.getId());
                 utm.setRefUserId(user.getId());
@@ -164,6 +172,11 @@ public class RemindCommand implements Command, ApplicationContextAware {
             log.info("Added User to database: " + u.toString());
         }
         return user;
+    }
+
+    private boolean checkForExistingReminder(String meetID, String userID) {
+        return ((List<UserToMeeting>) utmRepository.findAll()).stream()
+                .anyMatch(utm -> utm.getRefUserId().equals(userID) && utm.getRefMeetingId().equals(meetID));
     }
 
     private void sendResponseMessage(CommandContext ctx, String msg) {

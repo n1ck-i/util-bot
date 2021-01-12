@@ -25,7 +25,7 @@ import org.ub.utilbot.repositories.UserToMeetingRepository;
 import javax.security.auth.login.LoginException;
 @Component
 
-public class Reminder implements ApplicationContextAware {
+public class  Reminder implements ApplicationContextAware {
     private final Logger log = LogManager.getLogger(Reminder.class);
 
     @Autowired
@@ -67,11 +67,29 @@ public class Reminder implements ApplicationContextAware {
             log.warn("No Meetings found.");
             return;
         }
+
         //get bot class
         JDA jda = this.appContext.getBean(Bot.class).getClient();
 
         //Find relevent User Discord IDs and send messages in for loop (iterating over the relevent meetings)
         for(Meeting m : meetings) {
+
+            //Filter the lectures and send message in Lecture Channel
+            log.info("Searching for current lectures");
+            if(m.getGroupNumber() == 0){
+                String link = m.getLink();
+                String message = "The lecture will begin soon!" +  "Here is the Link: " + link;
+                for ( Professor prof : profRepository.getProfs()){
+                    if (prof.getId() == m.getRefProfId()){
+                        String channelID = prof.getChannelId();
+                        break;
+                    }
+                }
+                log.info("Sending reminder in Lecture Channel");
+                //MessageChannel channel = jda.getGuildByID(760421261649248296).getTextChannelById(channelID); // Channel auf Info & IT-Sec Erstis Bonn
+                MessageChannel channel = jda.getGuildByID(786297622876651611).getTextChannelById(798513607846920193); // Testdaten für UbotBestBot
+                channel.sendMessage(message).queue();
+            }
 
             //Grab the uto database elements
             log.info("Grabbing user database elements");

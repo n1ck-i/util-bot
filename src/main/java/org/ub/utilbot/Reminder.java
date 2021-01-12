@@ -83,7 +83,7 @@ public class Reminder implements ApplicationContextAware {
             log.info("Searching for current lectures");
             if(m.getGroupNumber() == 0){
                 String link = m.getLink();
-                String message = "The lecture will begin soon!" +  "Here is the Link: " + link;
+                String message = "The lecture will begin soon!\n" +  "Here is the Link: " + link;
                 String channelId = "";
                 for ( Professor prof : profRepository.findAll()){
                     if (prof.getId() == m.getRefProfId()){
@@ -115,12 +115,10 @@ public class Reminder implements ApplicationContextAware {
                 log.info("In for loop now");
                 //check if meeting has refTutorID to filter the vorlesung and tutorium
                 if(m.getRefTutorId() == null){
-                    message = "@" + user.getName() + "" + "one of your lectures will begin soon! " + "Here is the Link: " + link;
+                    message = "@" + user.getName() + "" + "one of your lectures will begin soon!\n" + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
-                }
-
-                else{
-                    message = "@" + user.getName() + " one of your exercises will begin soon! " + "Here is the Link: " + link;
+                } else{
+                    message = "@" + user.getName() + " one of your exercises will begin soon!\n" + "Here is the Link: " + link;
                     log.info("Message made for " + user.getName());
                 }
 
@@ -128,13 +126,12 @@ public class Reminder implements ApplicationContextAware {
                 try {
                     user.openPrivateChannel().queue((channel) -> {channel.sendMessage(message).queue();});
                     log.info("Message sent to " + user.getName());
-                }
-                catch(Exception e) {
+                } catch(Exception e) {
                     log.error("Bot could not send DM to User " + user.getName() + Arrays.toString(e.getStackTrace()));
-                }
                 }
             }
         }
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

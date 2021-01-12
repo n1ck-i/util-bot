@@ -1,14 +1,13 @@
 package org.ub.utilbot;
 
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import java.sql.Time;
 import java.time.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -17,15 +16,18 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
+import org.ub.utilbot.commands.RepositoryAccess;
 import org.ub.utilbot.entities.Meeting;
+import org.ub.utilbot.entities.Professor;
 import org.ub.utilbot.entities.UserToMeeting;
 import org.ub.utilbot.repositories.MeetingRepository;
+import org.ub.utilbot.repositories.ProfessorRepository;
 import org.ub.utilbot.repositories.UserRepository;
 import org.ub.utilbot.repositories.UserToMeetingRepository;
 import javax.security.auth.login.LoginException;
 @Component
 
-public class  Reminder implements ApplicationContextAware {
+public class Reminder implements ApplicationContextAware {
     private final Logger log = LogManager.getLogger(Reminder.class);
 
     @Autowired
@@ -36,6 +38,9 @@ public class  Reminder implements ApplicationContextAware {
 
     @Autowired
     private MeetingRepository meetRepository;
+
+    @Autowired
+    private ProfessorRepository profRepository;
 
     private ApplicationContext appContext;
 
@@ -79,15 +84,16 @@ public class  Reminder implements ApplicationContextAware {
             if(m.getGroupNumber() == 0){
                 String link = m.getLink();
                 String message = "The lecture will begin soon!" +  "Here is the Link: " + link;
-                for ( Professor prof : profRepository.getProfs()){
+                String channelId = "";
+                for ( Professor prof : profRepository.findAll()){
                     if (prof.getId() == m.getRefProfId()){
-                        String channelID = prof.getChannelId();
+                        channelId = prof.getChannelId();
                         break;
                     }
                 }
                 log.info("Sending reminder in Lecture Channel");
-                //MessageChannel channel = jda.getGuildByID(760421261649248296).getTextChannelById(channelID); // Channel auf Info & IT-Sec Erstis Bonn
-                MessageChannel channel = jda.getGuildByID(786297622876651611).getTextChannelById(798513607846920193); // Testdaten für UbotBestBot
+                //MessageChannel channel = jda.getGuildByID(760421261649248296l).getTextChannelById(channelId); // Channel auf Info & IT-Sec Erstis Bonn
+                MessageChannel channel = jda.getGuildById(786297622876651611l).getTextChannelById(798513607846920193l); // Testdaten für UbotBestBot
                 channel.sendMessage(message).queue();
             }
 

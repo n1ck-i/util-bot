@@ -81,7 +81,6 @@ public class RepositoryAccess implements Command {
 
         profs.forEach(profList::add);
         return profList;
-
     }
     
 

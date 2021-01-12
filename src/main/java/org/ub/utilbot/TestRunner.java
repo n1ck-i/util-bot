@@ -16,8 +16,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.entities.User;
 import org.ub.utilbot.repositories.UserRepository;
-/*
-// @Component is used so that the springframework knows to instaciate this class
+
+// @Component is used so that the springframework knows to instanciate this class
 //@Component
 // the profile settings are set so that this will not be executed during JUnit context test (compile time)
 @Profile("!test")
@@ -30,7 +30,7 @@ public class TestRunner implements CommandLineRunner {
 
 	// with @Autowired the spring framework will automatically create
 	// an instance of the specified interface (org.ub.ubot.repositories.UserRepository)
-	// ass well as the necessary MySQL query code at runtime and "inject" it
+	// as well as the necessary MySQL query code at runtime and "inject" it
 	@Autowired
 	private UserRepository userRepo;
 
@@ -61,4 +61,4 @@ public class TestRunner implements CommandLineRunner {
 		log.info("New user saved under id: " + second.getId());
 	}
 
-}*/
+}

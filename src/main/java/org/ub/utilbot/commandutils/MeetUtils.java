@@ -33,17 +33,9 @@ public class MeetUtils {
 
     private final Logger log = LogManager.getLogger(MeetUtils.class);
 
-    public List<Meeting> getMeetings(String subject, String identifier, int day) {
-        // Grab a list of professors and of IDs
-        List<Professor> subjectProfs = (List<Professor>) profRepository.findBySubject(subject);
-        List<String> subjectProfsIDs = subjectProfs.stream()
-                .map(Professor::getId)
-                .collect(Collectors.toList());
+    public List<Meeting> getMeetings(Professor prof, String identifier, int day) {
 
-        // Filter the meetingList by which meeting's professor's ID is on the list of subjectProfs IDs
-        List<Meeting> meetings = ((List<Meeting>)meetRepository.findAll()).stream()
-                .filter(m -> subjectProfsIDs.contains(m.getRefProfId()))
-                .collect(Collectors.toList());
+        List<Meeting> meetings = (List<Meeting>) meetRepository.findByRefProfId(prof.getId());
 
         // If there's no identifier, then it returns the subject's lectures
         if (identifier.equals("")) {

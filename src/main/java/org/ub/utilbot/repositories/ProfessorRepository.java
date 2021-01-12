@@ -7,6 +7,6 @@ public interface ProfessorRepository extends CrudRepository<Professor, Integer> 
 
 	Professor findById(String id);
 	Iterable<Professor> findAll();
-	Iterable<Professor> findBySubject(String subject);
-	Iterable<Professor> findByChannelId(String channelId);
+	Professor findBySubject(String subject);
+	Professor findByChannelId(String channelId);
 }

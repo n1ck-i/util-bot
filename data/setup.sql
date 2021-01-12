@@ -8,7 +8,9 @@ CREATE TABLE `ubot`.`Professor` (
 	`Name` VARCHAR(50) NOT NULL,
 	`Subject` VARCHAR(20) NOT NULL,
 	`ChannelId` VARCHAR(50) NOT NULL,
-	PRIMARY KEY (`id`));
+	PRIMARY KEY (`id`),
+	UNIQUE (`Subject`),
+	UNIQUE (`ChannelId`));
 
 CREATE TABLE `ubot`.`Meeting` (
 	`id` VARCHAR(40) NOT NULL,

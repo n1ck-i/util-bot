@@ -54,7 +54,7 @@ public class RemoveCommand implements Command {
 
         if (utmElement != null) {
 
-            User user = userRepository.findByDiscordId(context.getMember().getId());
+            User user = userRepository.findByDiscordId(context.getMessage().getAuthor().getId());
             // Checks if the reminder is by the given user
             if (user != null && user.getId().equals(utmElement.getRefUserId())) {
 
@@ -68,11 +68,11 @@ public class RemoveCommand implements Command {
 
                 return;
             } else {
-                log.warn("User(" + context.getMember().getId() + ") tried to remove userToMeeting not relating to him");
+                log.warn("User(" + context.getMessage().getAuthor().getId() + ") tried to remove userToMeeting not relating to him");
             }
         }
 
-        log.warn("User(" + context.getMember().getId() + ") tried to remove non existing userToMeeting entry");
+        log.warn("User(" + context.getMessage().getAuthor().getId() + ") tried to remove non existing userToMeeting entry");
         context.getChannel().sendMessage("I could not find a responding reminder for the given ID.").queue();
     }
 }

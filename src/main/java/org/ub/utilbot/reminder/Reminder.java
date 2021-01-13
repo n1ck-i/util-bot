@@ -95,20 +95,20 @@ public class Reminder implements ApplicationContextAware {
                 //check if meeting has refTutorID to filter the lectures from exercises
                 if(m.getRefTutorId() == null){
                     //EmbedBuilder used to make Embed for Message
-                    EmbedBuilder eb = new EmbedBuilder()
-                            .setTitle("You have a reminder!", null)
-                            .setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
-                            eb.setColor(new Color(63,196,224));
+                    EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle("You have a reminder!", null);
+                        eb.setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
+                        eb.setColor(new Color(63,196,224));
                     messageEmbed = eb.build();
                     log.info("Message made for " + user.getName());
 
                 } else {
                     //EmbedBuilder used to make Embed for Message
-                    EmbedBuilder eb = new EmbedBuilder()
-                            .setTitle("You have a reminder!", null)
-                            .setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
+                    EmbedBuilder eb = new EmbedBuilder();
+                        eb.setColor(new Color(63,196,224));
+                        eb.setTitle("You have a reminder!", null);
+                        eb.setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
                     messageEmbed = eb.build();
-                    eb.setColor(new Color(63,196,224));
                     log.info("Message made for " + user.getName());
 
                 }

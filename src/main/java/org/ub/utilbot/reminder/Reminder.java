@@ -6,9 +6,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.security.auth.login.LoginException;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.BeansException;
@@ -25,6 +26,7 @@ import org.ub.utilbot.repositories.UserToMeetingRepository;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
+import java.awt.Color;
 @Component
 
 public class Reminder implements ApplicationContextAware {
@@ -87,23 +89,33 @@ public class Reminder implements ApplicationContextAware {
             // Iterate through Users for the next step
             log.info("Starting to Iterate through Users. User size = " + users.size());
             for (User user : users) {
-                // Content for the messages and declare variable message
+                //declare variable messageEmbed
                 String link = m.getLink();
-                String message;
+                MessageEmbed messageEmbed;
                 //check if meeting has refTutorID to filter the lectures from exercises
                 if(m.getRefTutorId() == null){
-                    message = "@" + user.getName() + "" + "one of your lectures will begin soon! " + "Here is the Link: " + link;
+                    //EmbedBuilder used to make Embed for Message
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("You have a reminder!", null)
+                            .setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
+                            eb.setColor(new Color(63,196,224));
+                    messageEmbed = eb.build();
                     log.info("Message made for " + user.getName());
 
                 } else {
-                    message = "@" + user.getName() + " one of your exercises will begin soon! " + "Here is the Link: " + link;
+                    //EmbedBuilder used to make Embed for Message
+                    EmbedBuilder eb = new EmbedBuilder()
+                            .setTitle("You have a reminder!", null)
+                            .setDescription("@" + user.getName() + " one of your lectures will begin soon! Here is the Link: " + link);
+                    messageEmbed = eb.build();
+                    eb.setColor(new Color(63,196,224));
                     log.info("Message made for " + user.getName());
 
                 }
 
                 // Open DM with User and send message
                 try {
-                    user.openPrivateChannel().queue((channel) -> {channel.sendMessage(message).queue();});
+                    user.openPrivateChannel().queue((channel) -> {channel.sendMessage(messageEmbed).queue();});
                     log.info("Message sent to " + user.getName());
 
                 } catch(Exception e) {

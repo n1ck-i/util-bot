@@ -44,7 +44,7 @@ public class RemoveCommand implements Command {
 
     @Override
     public String getUsage() {
-        return "!remove <ReminderID>";
+        return "!remove [ReminderID]";
     }
 
     @Override

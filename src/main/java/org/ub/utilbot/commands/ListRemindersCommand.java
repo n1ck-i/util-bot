@@ -52,7 +52,7 @@ public class ListRemindersCommand implements Command {
 
     @Override
     public void onCommand(CommandContext context) {
-        User user = userRepository.findByDiscordId(context.getMember().getId());
+        User user = userRepository.findByDiscordId(context.getMessage().getAuthor().getId());
         if (user == null) {
             context.getChannel().sendMessage("You have no reminders at this point.").queue();
             return;

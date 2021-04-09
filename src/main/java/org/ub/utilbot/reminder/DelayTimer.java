@@ -27,16 +27,23 @@ class DelayTimer implements CommandLineRunner, ApplicationContextAware {
     @Override
     public void run(String... args) throws Exception {
 
-        // calculate the delay so that riminder will always be triggerd
+        // calculate the delay so that reminder will always be triggered
         // at 10 past and 40 min
         int minutes = Calendar.getInstance().get(Calendar.MINUTE);
         int seconds = Calendar.getInstance().get(Calendar.SECOND);
         long delay;
-        if (minutes < 11) {
+
+        if (minutes <= 10) {
+            // Delay = 10 minutes - current minute
             delay = 600 - (minutes * 60 + seconds);
+        } else if (minutes > 40){
+            // Delay = 10 minutes + 60 minutes - current minutes
+            delay = 600 + 3600 - (minutes * 60 + seconds);
         } else {
-            delay = 1800 - (minutes * 60 + seconds);
+            // Delay = 40 minutes - current minutes
+            delay = 2400 - (minutes * 60 + seconds);
         }
+
         // convert to milliseconds
         delay *= 1000;
 

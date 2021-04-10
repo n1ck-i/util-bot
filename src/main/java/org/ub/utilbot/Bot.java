@@ -3,6 +3,7 @@ package org.ub.utilbot;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 
+import net.dv8tion.jda.api.entities.Activity;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.springframework.beans.BeansException;
@@ -38,6 +39,7 @@ public class Bot implements CommandLineRunner, ApplicationContextAware {
         client = JDABuilder.createDefault(token).build();
         client.addEventListener(new MessageReceivedListener());
 
+        client.getPresence().setActivity(Activity.watching("for !help 👀"));
         log.info("Bot started.");
 
         // register available commands

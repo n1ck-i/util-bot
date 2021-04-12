@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import net.dv8tion.jda.api.Permission;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,9 @@ public class RepositoryAccess implements Command {
 
     @Override
     public void onCommand(CommandContext context) {
-        log.info(Arrays.toString(context.getArgs()));
+        if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+            return;
+        }
         switch (context.getArgs()[0]) {
             case "addProf":
                 addProf(context);

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,24 +68,73 @@ public class RepositoryAccess implements Command {
                 addTutoring(context);
                 break;
             case "getProfs":
-                List<Professor> profs = getProfs();
-                String profString = "";
-                for (Professor prof: profs) {
-                    profString += prof.getName() + " : " + prof.getSubject() + " - <#" + prof.getChannelId() + ">\n";
-                }
-                context.getChannel().sendMessage(profString).queue();
+                getProfs(context);
+                break;
+            case "getMeetings":
+                getMeetings(context);
+                break;
+            case "getTutors":
+                getTutors(context);
                 break;
         }
 
     }
 
-    private List<Professor> getProfs() {
+    private void getTutors(CommandContext context) {
+        Iterable<Tutor> tuts = tutRepository.findAll();
+        List<Tutor> tutList = new ArrayList<>();
+
+        tuts.forEach(tutList::add);
+        String tutString = "";
+        for (Tutor tut: tutList) {
+            tutString += tut.getName() + " | " + tut.getId() + "\n";
+        }
+        // Splits the message into sendable chunks in case it is too long
+        for (String s : splitMessage(tutString)) {
+            context.getChannel().sendMessage(s).queue();
+        }
+
+    }
+
+    private void getProfs(CommandContext context) {
         Iterable<Professor> profs = profRepository.findAll();
         List<Professor> profList = new ArrayList<>();
 
         profs.forEach(profList::add);
-        return profList;
 
+        String profString = "";
+        for (Professor prof: profList) {
+            profString += prof.getName() + " : " + prof.getSubject() + " - <#" + prof.getChannelId() + "> | " + prof.getId() + "\n";
+        }
+        // Splits the message into sendable chunks in case it is too long
+        for (String s : splitMessage(profString)) {
+            context.getChannel().sendMessage(s).queue();
+        }
+
+    }
+
+    private void getMeetings(CommandContext context) {
+        String[] days = {"Sunday","Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
+        Iterable<Meeting> meets = meetRepository.findAll();
+        List<Meeting> meetList = new ArrayList<>();
+
+        meets.forEach(meetList::add);
+
+        String meetString = "";
+        for (Meeting meet: meetList) {
+            meetString += "**" + days[meet.getWeekday()] + "** at **" + meet.getStartTime() + "** | **Prof**: " + profRepository.findById(meet.getRefProfId());
+            if (meet.getRefTutorId() != null) {
+                meetString += " | **Tutor**: " + tutRepository.findById(meet.getRefTutorId());
+            }
+            meetString += "\n";
+        }
+
+
+        // Splits the message into sendable chunks in case it is too long
+        for (String s : splitMessage(meetString)) {
+            System.out.println(s.length());
+            context.getChannel().sendMessage(s).queue();
+        }
     }
 
     private void addProf(CommandContext context) {
@@ -95,6 +145,7 @@ public class RepositoryAccess implements Command {
 
         prof = profRepository.save(prof);
         log.info("Added professor to repository: " + prof.toString());
+        context.getChannel().sendMessage("Added professor to repository: " + prof.toString()).queue();
     }
 
 
@@ -120,6 +171,7 @@ public class RepositoryAccess implements Command {
 
         meeting = meetRepository.save(meeting);
         log.info("Added lecture to repository: " + meeting.toString());
+        context.getChannel().sendMessage("Added lecture to repository: " + meeting.toString()).queue();
     }
 
     private void addTutoring(CommandContext context) {
@@ -146,6 +198,7 @@ public class RepositoryAccess implements Command {
 
         meeting = meetRepository.save(meeting);
         log.info("Added tutoring to repository: " + meeting.toString());
+        context.getChannel().sendMessage("Added tutoring to repository: " + meeting.toString()).queue();
     }
 
     private void addTutor(CommandContext context) {
@@ -154,6 +207,28 @@ public class RepositoryAccess implements Command {
 
         tut = tutRepository.save(tut);
         log.info("Added Tutor: " + tut.toString());
+        context.getChannel().sendMessage("Added Tutor: " + tut.toString()).queue();
 
+    }
+
+    private List<String> splitMessage(String message) {
+        List<String> messageSplits = new ArrayList<>();
+        if (message.length() > 2000) {
+            String[] splitMessage = message.split("\n");
+            String tempSplit = "";
+            for (int i = 0; i < splitMessage.length; i++) {
+                tempSplit += splitMessage[i] + "\n";
+                if (i != 0 && i % 5 == 0) {
+                    messageSplits.add(tempSplit);
+                    tempSplit = "";
+                }
+            }
+            messageSplits.add(tempSplit);
+        } else {
+            messageSplits.add(message);
+        }
+        // Filters out empty strings
+        messageSplits = messageSplits.stream().filter(s -> !s.equals("")).collect(Collectors.toList());
+        return messageSplits;
     }
 }

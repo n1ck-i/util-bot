@@ -11,9 +11,11 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
@@ -26,6 +28,11 @@ import org.ub.utilbot.repositories.TutorRepository;
 
 @Component
 public class RepositoryAccess implements Command {
+    @Value("${app.jda.repoEditRole}")
+    private String repoEdit;
+
+    private Role repoRole = null;
+
     @Autowired
     private ProfessorRepository profRepository;
 
@@ -54,7 +61,11 @@ public class RepositoryAccess implements Command {
 
     @Override
     public void onCommand(CommandContext context) {
-        if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+        if (repoRole == null) {
+            repoRole = context.getMember().getJDA().getRoleById(Long.parseLong(repoEdit));
+        }
+        if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)
+            || context.getMember().getRoles().contains(context.getMember().getJDA().getRoleById(Long.parseLong(repoEdit)))) {
             return;
         }
         switch (context.getArgs()[0]) {

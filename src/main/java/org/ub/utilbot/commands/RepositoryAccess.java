@@ -29,7 +29,7 @@ import org.ub.utilbot.repositories.TutorRepository;
 @Component
 public class RepositoryAccess implements Command {
     @Value("${app.jda.repoEditRole}")
-    private String repoEdit;
+    private String repoEditID;
 
     private Role repoRole = null;
 
@@ -62,34 +62,34 @@ public class RepositoryAccess implements Command {
     @Override
     public void onCommand(CommandContext context) {
         if (repoRole == null) {
-            repoRole = context.getMember().getJDA().getRoleById(Long.parseLong(repoEdit));
+            repoRole = context.getMember().getJDA().getRoleById(repoEditID);
         }
-        if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)
-            || !context.getMember().getRoles().contains(repoRole)) {
-            return;
-        }
-        switch (context.getArgs()[0]) {
-            case "addProf":
-                addProf(context);
-                break;
-            case "addTutor":
-                addTutor(context);
-                break;
-            case "addLecture":
-                addLecture(context);
-                break;
-            case "addTutoring":
-                addTutoring(context);
-                break;
-            case "getProfs":
-                getProfs(context);
-                break;
-            case "getMeetings":
-                getMeetings(context);
-                break;
-            case "getTutors":
-                getTutors(context);
-                break;
+
+        if (context.getMember().hasPermission(Permission.ADMINISTRATOR)
+            || context.getMember().getRoles().contains(repoRole)) {
+            switch (context.getArgs()[0]) {
+                case "addProf":
+                    addProf(context);
+                    break;
+                case "addTutor":
+                    addTutor(context);
+                    break;
+                case "addLecture":
+                    addLecture(context);
+                    break;
+                case "addTutoring":
+                    addTutoring(context);
+                    break;
+                case "getProfs":
+                    getProfs(context);
+                    break;
+                case "getMeetings":
+                    getMeetings(context);
+                    break;
+                case "getTutors":
+                    getTutors(context);
+                    break;
+            }
         }
 
     }

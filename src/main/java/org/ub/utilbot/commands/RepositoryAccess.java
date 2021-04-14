@@ -65,7 +65,7 @@ public class RepositoryAccess implements Command {
             repoRole = context.getMember().getJDA().getRoleById(Long.parseLong(repoEdit));
         }
         if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)
-            || !context.getMember().getRoles().contains(context.getMember().getJDA().getRoleById(Long.parseLong(repoEdit)))) {
+            || !context.getMember().getRoles().contains(repoRole)) {
             return;
         }
         switch (context.getArgs()[0]) {

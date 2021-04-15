@@ -11,9 +11,11 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Role;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.ub.utilbot.commandutils.Command;
 import org.ub.utilbot.commandutils.CommandContext;
@@ -26,6 +28,11 @@ import org.ub.utilbot.repositories.TutorRepository;
 
 @Component
 public class RepositoryAccess implements Command {
+    @Value("${app.jda.repoEditRole}")
+    private String repoEditID;
+
+    private Role repoRole = null;
+
     @Autowired
     private ProfessorRepository profRepository;
 
@@ -54,31 +61,35 @@ public class RepositoryAccess implements Command {
 
     @Override
     public void onCommand(CommandContext context) {
-        if (!context.getMember().hasPermission(Permission.ADMINISTRATOR)) {
-            return;
+        if (repoRole == null) {
+            repoRole = context.getMember().getJDA().getRoleById(repoEditID);
         }
-        switch (context.getArgs()[0]) {
-            case "addProf":
-                addProf(context);
-                break;
-            case "addTutor":
-                addTutor(context);
-                break;
-            case "addLecture":
-                addLecture(context);
-                break;
-            case "addTutoring":
-                addTutoring(context);
-                break;
-            case "getProfs":
-                getProfs(context);
-                break;
-            case "getMeetings":
-                getMeetings(context);
-                break;
-            case "getTutors":
-                getTutors(context);
-                break;
+
+        if (context.getMember().hasPermission(Permission.ADMINISTRATOR)
+            || context.getMember().getRoles().contains(repoRole)) {
+            switch (context.getArgs()[0]) {
+                case "addProf":
+                    addProf(context);
+                    break;
+                case "addTutor":
+                    addTutor(context);
+                    break;
+                case "addLecture":
+                    addLecture(context);
+                    break;
+                case "addTutoring":
+                    addTutoring(context);
+                    break;
+                case "getProfs":
+                    getProfs(context);
+                    break;
+                case "getMeetings":
+                    getMeetings(context);
+                    break;
+                case "getTutors":
+                    getTutors(context);
+                    break;
+            }
         }
 
     }

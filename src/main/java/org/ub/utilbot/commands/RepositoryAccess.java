@@ -62,7 +62,7 @@ public class RepositoryAccess implements Command {
     @Override
     public void onCommand(CommandContext context) {
         if (repoRole == null) {
-            repoRole = context.getMember().getJDA().getRoleById(repoEditID);
+            repoRole = context.getMember().getGuild().getRoleById(repoEditID);
         }
 
         if (context.getMember().hasPermission(Permission.ADMINISTRATOR)

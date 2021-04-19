@@ -67,26 +67,35 @@ public class RepositoryAccess implements Command {
 
         if (context.getMember().hasPermission(Permission.ADMINISTRATOR)
             || context.getMember().getRoles().contains(repoRole)) {
+            log.info("Entered repo command switch case");
+            log.info("Command: " + context.getArgs()[0]);
             switch (context.getArgs()[0]) {
                 case "addProf":
+                    log.info("Ran " + context.getArgs()[0]);
                     addProf(context);
                     break;
                 case "addTutor":
+                    log.info("Ran " + context.getArgs()[0]);
                     addTutor(context);
                     break;
                 case "addLecture":
+                    log.info("Ran " + context.getArgs()[0]);
                     addLecture(context);
                     break;
                 case "addTutoring":
+                    log.info("Ran " + context.getArgs()[0]);
                     addTutoring(context);
                     break;
                 case "getProfs":
+                    log.info("Ran " + context.getArgs()[0]);
                     getProfs(context);
                     break;
                 case "getMeetings":
+                    log.info("Ran " + context.getArgs()[0]);
                     getMeetings(context);
                     break;
                 case "getTutors":
+                    log.info("Ran " + context.getArgs()[0]);
                     getTutors(context);
                     break;
             }

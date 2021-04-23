@@ -14,7 +14,6 @@ public class MessageReceivedListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
-        log.info("Received message: " + e.getMessage().getContentRaw());
         String prefix = CommandManager.getPrefix();
 
         if (!e.getMessage().getContentRaw().startsWith(prefix)) {

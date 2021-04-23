@@ -62,32 +62,55 @@ public class RepositoryAccess implements Command {
     @Override
     public void onCommand(CommandContext context) {
         if (repoRole == null) {
-            repoRole = context.getMember().getJDA().getRoleById(repoEditID);
+            repoRole = context.getMember().getGuild().getRoleById(repoEditID);
         }
 
         if (context.getMember().hasPermission(Permission.ADMINISTRATOR)
             || context.getMember().getRoles().contains(repoRole)) {
+            log.info("Entered repo command switch case");
+            log.info("Command: " + context.getArgs()[0]);
             switch (context.getArgs()[0]) {
                 case "addProf":
+                    log.info("Ran " + context.getArgs()[0]);
                     addProf(context);
                     break;
                 case "addTutor":
+                    log.info("Ran " + context.getArgs()[0]);
                     addTutor(context);
                     break;
                 case "addLecture":
+                    log.info("Ran " + context.getArgs()[0]);
                     addLecture(context);
                     break;
                 case "addTutoring":
+                    log.info("Ran " + context.getArgs()[0]);
                     addTutoring(context);
                     break;
                 case "getProfs":
+                    log.info("Ran " + context.getArgs()[0]);
                     getProfs(context);
                     break;
                 case "getMeetings":
+                    log.info("Ran " + context.getArgs()[0]);
                     getMeetings(context);
                     break;
                 case "getTutors":
+                    log.info("Ran " + context.getArgs()[0]);
                     getTutors(context);
+                    break;
+                case "removeProf":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeProf(context);
+                    break;
+                case "removeMeeting":
+                case "removeTutoring":
+                case "removeLecture":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeMeeting(context);
+                    break;
+                case "removeTutor":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeTutor(context);
                     break;
             }
         }
@@ -136,9 +159,9 @@ public class RepositoryAccess implements Command {
 
         String meetString = "";
         for (Meeting meet: meetList) {
-            meetString += "**" + days[meet.getWeekday()] + "** at **" + meet.getStartTime() + "** | **Prof**: " + profRepository.findById(meet.getRefProfId());
+            meetString += "**" + days[meet.getWeekday()] + "** at **" + meet.getStartTime() + "** ID: " + meet.getId() +"\n--- **Prof**: " + profRepository.findById(meet.getRefProfId());
             if (meet.getRefTutorId() != null) {
-                meetString += " | **Tutor**: " + tutRepository.findById(meet.getRefTutorId());
+                meetString += "\n--- **Tutor**: " + tutRepository.findById(meet.getRefTutorId());
             }
             meetString += "\n";
         }
@@ -146,7 +169,6 @@ public class RepositoryAccess implements Command {
 
         // Splits the message into sendable chunks in case it is too long
         for (String s : splitMessage(meetString)) {
-            System.out.println(s.length());
             context.getChannel().sendMessage(s).queue();
         }
     }
@@ -161,7 +183,6 @@ public class RepositoryAccess implements Command {
         log.info("Added professor to repository: " + prof.toString());
         context.getChannel().sendMessage("Added professor to repository: " + prof.toString()).queue();
     }
-
 
     private void addLecture(CommandContext context) {
         Meeting meeting = new Meeting();
@@ -223,6 +244,39 @@ public class RepositoryAccess implements Command {
         log.info("Added Tutor: " + tut.toString());
         context.getChannel().sendMessage("Added Tutor: " + tut.toString()).queue();
 
+    }
+
+    private void removeProf(CommandContext context) {
+        Professor prof = profRepository.findById(context.getArgs()[1]);
+        if (prof != null) {
+            profRepository.delete(prof);
+            log.info("Deleted Professor: " + prof);
+            context.getChannel().sendMessage("Deleted Professor: " + prof).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a professor with the given ID").queue();
+        }
+    }
+
+    private void removeMeeting(CommandContext context) {
+        Meeting meet = meetRepository.findById(context.getArgs()[1]);
+        if (meet != null) {
+            meetRepository.delete(meet);
+            log.info("Deleted Meeting: " + meet);
+            context.getChannel().sendMessage("Deleted Meeting: " + meet).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a meeting with the given ID").queue();
+        }
+    }
+
+    private void removeTutor(CommandContext context) {
+        Tutor tut = tutRepository.findById(context.getArgs()[1]);
+        if (tut != null) {
+            tutRepository.delete(tut);
+            log.info("Deleted Tutor: " + tut);
+            context.getChannel().sendMessage("Deleted Tutor: " + tut).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a tutor with the given ID").queue();
+        }
     }
 
     private List<String> splitMessage(String message) {

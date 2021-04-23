@@ -250,31 +250,34 @@ public class RepositoryAccess implements Command {
     private void removeProf(CommandContext context) {
         Professor prof = profRepository.findById(context.getArgs()[1]);
         if (prof != null) {
-            profRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            profRepository.delete(prof);
             log.info("Deleted Professor: " + prof);
             context.getChannel().sendMessage("Deleted Professor: " + prof).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a professor with the given ID").queue();
         }
-        context.getChannel().sendMessage("I could not find a professor with the given ID").queue();
     }
 
     private void removeMeeting(CommandContext context) {
         Meeting meet = meetRepository.findById(context.getArgs()[1]);
         if (meet != null) {
-            meetRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            meetRepository.delete(meet);
             log.info("Deleted Meeting: " + meet);
             context.getChannel().sendMessage("Deleted Meeting: " + meet).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a meeting with the given ID").queue();
         }
-        context.getChannel().sendMessage("I could not find a meeting with the given ID").queue();
     }
 
     private void removeTutor(CommandContext context) {
         Tutor tut = tutRepository.findById(context.getArgs()[1]);
         if (tut != null) {
-            tutRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            tutRepository.delete(tut);
             log.info("Deleted Tutor: " + tut);
             context.getChannel().sendMessage("Deleted Tutor: " + tut).queue();
+        } else {
+            context.getChannel().sendMessage("I could not find a tutor with the given ID").queue();
         }
-        context.getChannel().sendMessage("I could not find a tutor with the given ID").queue();
     }
 
     private List<String> splitMessage(String message) {

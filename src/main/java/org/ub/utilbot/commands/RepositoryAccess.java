@@ -159,9 +159,9 @@ public class RepositoryAccess implements Command {
 
         String meetString = "";
         for (Meeting meet: meetList) {
-            meetString += "**" + days[meet.getWeekday()] + "** at **" + meet.getStartTime() + "** | **Prof**: " + profRepository.findById(meet.getRefProfId());
+            meetString += "**" + days[meet.getWeekday()] + "** at **" + meet.getStartTime() + "** ID: " + meet.getId() +"\n||| **Prof**: " + profRepository.findById(meet.getRefProfId());
             if (meet.getRefTutorId() != null) {
-                meetString += " | **Tutor**: " + tutRepository.findById(meet.getRefTutorId());
+                meetString += "\n||| **Tutor**: " + tutRepository.findById(meet.getRefTutorId());
             }
             meetString += "\n";
         }

@@ -169,7 +169,6 @@ public class RepositoryAccess implements Command {
 
         // Splits the message into sendable chunks in case it is too long
         for (String s : splitMessage(meetString)) {
-            System.out.println(s.length());
             context.getChannel().sendMessage(s).queue();
         }
     }

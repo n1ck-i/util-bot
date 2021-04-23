@@ -98,6 +98,20 @@ public class RepositoryAccess implements Command {
                     log.info("Ran " + context.getArgs()[0]);
                     getTutors(context);
                     break;
+                case "removeProf":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeProf(context);
+                    break;
+                case "removeMeeting":
+                case "removeTutoring":
+                case "removeLecture":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeMeeting(context);
+                    break;
+                case "removeTutor":
+                    log.info("Ran " + context.getArgs()[0]);
+                    removeTutor(context);
+                    break;
             }
         }
 
@@ -171,7 +185,6 @@ public class RepositoryAccess implements Command {
         context.getChannel().sendMessage("Added professor to repository: " + prof.toString()).queue();
     }
 
-
     private void addLecture(CommandContext context) {
         Meeting meeting = new Meeting();
 
@@ -232,6 +245,36 @@ public class RepositoryAccess implements Command {
         log.info("Added Tutor: " + tut.toString());
         context.getChannel().sendMessage("Added Tutor: " + tut.toString()).queue();
 
+    }
+
+    private void removeProf(CommandContext context) {
+        Professor prof = profRepository.findById(context.getArgs()[1]);
+        if (prof != null) {
+            profRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            log.info("Deleted Professor: " + prof);
+            context.getChannel().sendMessage("Deleted Professor: " + prof).queue();
+        }
+        context.getChannel().sendMessage("I could not find a professor with the given ID").queue();
+    }
+
+    private void removeMeeting(CommandContext context) {
+        Meeting meet = meetRepository.findById(context.getArgs()[1]);
+        if (meet != null) {
+            meetRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            log.info("Deleted Meeting: " + meet);
+            context.getChannel().sendMessage("Deleted Meeting: " + meet).queue();
+        }
+        context.getChannel().sendMessage("I could not find a meeting with the given ID").queue();
+    }
+
+    private void removeTutor(CommandContext context) {
+        Tutor tut = tutRepository.findById(context.getArgs()[1]);
+        if (tut != null) {
+            tutRepository.deleteById(Integer.parseInt(context.getArgs()[1]));
+            log.info("Deleted Tutor: " + tut);
+            context.getChannel().sendMessage("Deleted Tutor: " + tut).queue();
+        }
+        context.getChannel().sendMessage("I could not find a tutor with the given ID").queue();
     }
 
     private List<String> splitMessage(String message) {
